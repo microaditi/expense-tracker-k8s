@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: pg-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: expensetracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    container_name: expense-backend
+    ports:
+      - "3001:3001"
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGDATABASE: expensetracker
+      PGHOST: db
+      PGPORT: 5432
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: expense-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND=http://localhost:3001
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
+

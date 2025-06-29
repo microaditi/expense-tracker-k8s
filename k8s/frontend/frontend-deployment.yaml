@@ -1,0 +1,25 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: frontend
+  namespace: expense-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: microaditi/expense-frontend:v1
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef: 
+                name: frontend-config
+
+
